@@ -1,30 +1,36 @@
 from dataclasses import dataclass
 from datetime import date
-from typing import Literal, Dict, Any, List, Union
+from typing import Literal, Dict, Any, List, Union, Annotated
 from litestar import Controller, Litestar, post, get
+from litestar.params import Parameter
+from pydantic import BaseModel
 
 
 @dataclass
-class BaseBallPlayer:
-    name: str
-    description: str
-    birth_date: date
-    throwing_hand: Literal["right", "left", "both"]
-    batting_hand: Literal["right", "left", "both"]
+class BaseBallPlayer(BaseModel):
+    name: Annotated[str, Parameter(query="name")]
+    description: Annotated[str, Parameter(query="Description")]
+    birth_date: Annotated[date, Parameter(query="birth_date")]
+    throwing_hand: Annotated[
+        Literal["right", "left", "both"], Parameter(query="Throwing")
+    ]
+    batting_hand: Annotated[
+        Literal["right", "left", "both"], Parameter(query="Batting")
+    ]
 
 
-PLAYERS: List[BaseBallPlayer]
+PLAYERS: List[BaseBallPlayer] = []
 
 
 class BaseBallController(Controller):
     @post(path="/api/create")
-    async def create(self, data: BaseBallPlayer) -> Dict[str, Any]:
+    async def create(self, data: BaseBallPlayer) -> BaseBallPlayer:
         PLAYERS.append(data)
         return data
 
     @get(path="/api/players")
     async def get_all(self) -> List[BaseBallPlayer]:
-        return List[BaseBallPlayer]
+        return PLAYERS
 
     @get(path="/api/players/{name:str}")
     async def get_one(self, name: str) -> Union[BaseBallPlayer, None]:
