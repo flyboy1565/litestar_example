@@ -1,8 +1,10 @@
+from dataclasses import dataclass
 from datetime import date
 from typing import Literal, Dict, Any, List, Union
 from litestar import Controller, Litestar, post, get
 
 
+@dataclass
 class BaseBallPlayer:
     name: str
     description: str
