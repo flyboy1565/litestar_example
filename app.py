@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
+from tkinter import N
 from typing import Literal, Dict, Any, List, Union, Annotated
 from litestar import Controller, Litestar, post, get
 from litestar.params import Parameter
@@ -7,7 +8,7 @@ from pydantic import BaseModel
 
 
 @dataclass
-class BaseBallPlayer(BaseModel):
+class BaseBallPlayer:
     name: Annotated[str, Parameter(query="name")]
     description: Annotated[str, Parameter(query="Description")]
     birth_date: Annotated[date, Parameter(query="birth_date")]
@@ -24,7 +25,17 @@ PLAYERS: List[BaseBallPlayer] = []
 
 class BaseBallController(Controller):
     @post(path="/api/create")
-    async def create(self, data: BaseBallPlayer) -> BaseBallPlayer:
+    async def create(
+        self,
+        name: str,
+        description: str,
+        birth_date: date,
+        throwing_hand: str,
+        batting_hand: str,
+    ) -> BaseBallPlayer:
+        data = BaseBallPlayer(
+            name, description, birth_date, throwing_hand, batting_hand
+        )
         PLAYERS.append(data)
         return data
 
