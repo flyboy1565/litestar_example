@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 from datetime import date
-from tkinter import N
-from typing import Literal, Dict, Any, List, Union, Annotated
-from litestar import Controller, Litestar, post, get
-from litestar.params import Parameter
-from pydantic import BaseModel
+from typing import Annotated, List, Literal, Union
+
+import uvicorn
+from litestar import Controller, Litestar, get, post
+from litestar.enums import RequestEncodingType
+from litestar.params import Body, Parameter
 
 
 @dataclass
@@ -27,15 +28,11 @@ class BaseBallController(Controller):
     @post(path="/api/create")
     async def create(
         self,
-        name: str,
-        description: str,
-        birth_date: date,
-        throwing_hand: str,
-        batting_hand: str,
+        data: BaseBallPlayer = Body(
+            title="OAuth2Login", media_type=RequestEncodingType.URL_ENCODED
+        ),
     ) -> BaseBallPlayer:
-        data = BaseBallPlayer(
-            name, description, birth_date, throwing_hand, batting_hand
-        )
+        print(data)
         PLAYERS.append(data)
         return data
 
@@ -46,7 +43,9 @@ class BaseBallController(Controller):
     @get(path="/api/players/{name:str}")
     async def get_one(self, name: str) -> Union[BaseBallPlayer, None]:
         for player in PLAYERS:
+            print(player)
             if player.name == name:
+                print("found")
                 return player
         return None
 
